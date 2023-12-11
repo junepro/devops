@@ -2,5 +2,19 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/terraform/aws-alb-routing/.terraform/modules/acm" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/terraform/aws-alb-routing/.terraform/modules/alb" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/terraform/aws-alb-routing/.terraform/modules/ec2_private" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/terraform/aws-alb-routing/.terraform/modules/ec2_private_app2" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/terraform/aws-alb-routing/.terraform/modules/loadbalancer_sg" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/terraform/aws-alb-routing/.terraform/modules/vpc" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/terraform/aws-alb/.terraform/modules/alb" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/terraform/aws-alb/.terraform/modules/ec2_private" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/terraform/aws-alb/.terraform/modules/loadbalancer_sg" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/terraform/aws-alb/.terraform/modules/vpc" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/terraform/aws-elb-classicLB/.terraform/modules/ec2_private" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/terraform/aws-elb-classicLB/.terraform/modules/elb_http" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/terraform/aws-elb-classicLB/.terraform/modules/loadbalancer_sg" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/terraform/aws-elb-classicLB/.terraform/modules/vpc" vcs="Git" />
   </component>
 </project>
