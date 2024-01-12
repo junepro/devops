@@ -2,7 +2,8 @@
 # Security Group for private ec2
 module "private_sg" {
   source  = "terraform-aws-modules/security-group/aws"
-  version = "3.18.0"
+  #  version = "3.18.0"
+  version = "5.1.0"
 
   name = "private-sg"
   description = "private block"
