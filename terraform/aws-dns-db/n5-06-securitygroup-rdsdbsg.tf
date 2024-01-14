@@ -2,7 +2,8 @@
 module "rdsdb_sg" {
   source  = "terraform-aws-modules/security-group/aws"
   #version = "3.18.0"
-  version = "4.0.0"
+  #version = "4.0.0"
+  version = "5.1.0"
 
   name        = "rdsdb-sg"
   description = "Access to MySQL DB for entire VPC CIDR Block"

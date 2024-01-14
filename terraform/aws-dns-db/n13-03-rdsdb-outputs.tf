@@ -26,7 +26,8 @@ output "db_instance_hosted_zone_id" {
 
 output "db_instance_id" {
   description = "The RDS instance ID"
-  value       = module.rdsdb.db_instance_id
+  value       = module.rdsdb.db_instance_identifier
+
 }
 
 output "db_instance_resource_id" {
@@ -50,12 +51,13 @@ output "db_instance_username" {
   sensitive   = true
 }
 
+/*
 output "db_instance_password" {
   description = "The database password (this password may be old, because Terraform doesn't track it after initial creation)"
   value       = module.rdsdb.db_instance_password
   sensitive   = true
 }
-
+*/
 output "db_instance_port" {
   description = "The database port"
   value       = module.rdsdb.db_instance_port
