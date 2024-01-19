@@ -1,7 +1,8 @@
 # Create VPC Terraform Module
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
-  #version = "2.78.0"
+  #version = "3.0.0"
+  # version = "2.78.0"
   #version = "~> 2.78"
   version = "5.4.0"
 
