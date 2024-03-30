@@ -5,6 +5,25 @@ stages:
   - test
   - deploy
   - deploy tests
+  - cache
+
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+  paths: 
+    - node_modules/
+  polilcy: pull
+
+update cache:
+  stage: cache
+  script:
+    - npm install
+  cache:
+      key: ${CI_COMMIT_REF_SLUG}
+      paths:
+        - node_modules/
+      policy: push
+  only:
+    - schedules  
 
 build website:
  stages: build
@@ -17,12 +36,16 @@ build website:
  artifacts:
    paths:
     - ./public
+ except:
+ - schedules   
 
 test artifact:
   image: alpine
   stage: test
   script:
     - grep -q "Gatsby" ./public/index.html
+  except:
+  - schedules      
 
 test website:
   stage: test
@@ -32,12 +55,16 @@ test website:
     - gatsby serve &
     - sleep 3
     - curl "http://localhost:9000" | grep -q "Gatsby"
+  except:
+  - schedules      
 
 deploy to surge:
   stage: deploy
   script:
     - npm install --global surge
     - surge --project ./public --domain xxxx.surge.sh
+  except:
+  - schedules      
 
 test deploy:
   image: alpine
@@ -45,3 +72,5 @@ test deploy:
   script:
     - apk add --no-cahce curl
     - curl -s "https://instazone.surge.sh" | grep -q "Hi people"
+  except:
+  - schedules      
