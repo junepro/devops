@@ -1,0 +1,22 @@
+stage:
+  - build
+  - test
+
+build:
+  stage: build
+  image: openjdk:12-alpine
+  script:
+    - ./gradlew build
+  artifact:
+    paths:
+      - ./build/libs/
+
+smoke test:
+  stage: test
+  image: openjdk:12-alpine
+  before_script:
+    - apk --no-cache add curl 
+  script:
+    - java -jar ./build/libs/cars-api.jar & 
+    - sleep 30
+    - curl https://localhost:5000/actuator/health | grep "UP"
