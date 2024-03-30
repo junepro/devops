@@ -1,10 +1,13 @@
+image: node
+
 stages:
   - build
   - test
+  - deploy
+  - deploy tests
 
 build website:
  stages: build
- image: node
  script:
    - npm install
    - npm install -g gatsby-cli
@@ -20,7 +23,6 @@ test artifact:
     - grep -q "Gatsby" ./public/index.html
 
 test website:
-  image: node
   stage: test
   script:
     - npm install
@@ -28,3 +30,16 @@ test website:
     - gatsby serve &
     - sleep 3
     - curl "http://localhost:9000" | grep -q "Gatsby"
+
+deploy to surge:
+  stage: deploy
+  script:
+    - npm install --global surge
+    - surge --project ./public --domain xxxx.surge.sh
+
+test deploy:
+  image: alpine
+  stage: deploy tests
+  script:
+    - apk add --no-cahce curl
+    - curl -s "https://instazone.surge.sh" | grep -q "Hi people"
