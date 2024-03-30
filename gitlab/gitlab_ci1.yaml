@@ -31,6 +31,9 @@ update cache:
 
 build website:
  stages: build
+ only:
+   - master
+   - merge_requests 
  script:
    - echo $CI_COMMIT_SHORT_SHA
    - npm install
@@ -46,6 +49,9 @@ build website:
 test artifact:
   image: alpine
   stage: test
+  only:
+    - master
+    - merge_requests  
   script:
     - grep -q "Gatsby" ./public/index.html
   except:
@@ -53,6 +59,9 @@ test artifact:
 
 test website:
   stage: test
+  only:
+    - master
+    - merge_requests
   script:
     - npm install
     - npm install -g gatsby-cli
@@ -68,7 +77,7 @@ deploy staging:
     name: staging
     url: http://STAGING_DOMAIN
   only:
-   - master
+    - master
   script:
     - npm install --global surge
     - surge --project ./public --domain instazone-staging.surge.sh
