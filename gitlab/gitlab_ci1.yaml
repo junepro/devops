@@ -13,6 +13,10 @@ cache:
     - node_modules/
   polilcy: pull
 
+variables:
+  STAGING_DOMAIN: instazone-staging.surge.sh
+  PROUDCTION_DOMAIN : instazone.surge.sh
+
 update cache:
   stage: cache
   script:
@@ -62,7 +66,7 @@ deploy staging:
   stage: deploy staging
   environment:
     name: staging
-    url: http://instazone-staging.surge.sh
+    url: http://STAGING_DOMAIN
   script:
     - npm install --global surge
     - surge --project ./public --domain instazone-staging.surge.sh
@@ -71,7 +75,7 @@ deploy production:
   stage: deploy production
   environment:
     name: production
-    url: http://instazone.surge.sh
+    url: http://PRODUCTION_DOMAIN
   script:
     - npm install --global surge
     - surge --project ./public --domain instazone.surge.sh
