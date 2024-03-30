@@ -11,7 +11,11 @@ build:
   stage: build
   image: openjdk:12-alpine
   script:
+    - sed -i "s/CI_PIPELINE_IID/$CI_PIPELINE_IID/" ./src/main/resources/application.yml
+    - sed -i "s/CI_COMMIT_SHORT_SHA/$CI_COMMIT_SHORT_SHA/" ./src/main/resources/application.yml
+    - sed -i "s/CI_COMMIT_BRANCH/$CI_COMMIT_BRANCH/" ./src/main/resources/application.yml
     - ./gradlew build
+    - mv ./build/libs/cars-api.jar ./build/libs/$ARTIFACT_NAME
   artifact:
     paths:
       - ./build/libs/
