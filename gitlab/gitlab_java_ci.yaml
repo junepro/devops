@@ -93,4 +93,4 @@ pages:
     - mv newman/report.html public/index.html
   artifacts:
     paths:
-      - public
+      - publicls
