@@ -1,11 +1,13 @@
 variables:
   ARTIFACT_NAME: cars-api-v$CI_PIPELINE_IID.jar
-  APP_NAME: car-api
+  APP_NAME: cars-api
 
-stage:
+stages:
   - build
   - test
   - deploy
+  - post deploy
+  - publishing
 
 build:
   stage: build
@@ -16,7 +18,7 @@ build:
     - sed -i "s/CI_COMMIT_BRANCH/$CI_COMMIT_BRANCH/" ./src/main/resources/application.yml
     - ./gradlew build
     - mv ./build/libs/cars-api.jar ./build/libs/$ARTIFACT_NAME
-  artifact:
+  artifacts:
     paths:
       - ./build/libs/
 
@@ -24,11 +26,33 @@ smoke test:
   stage: test
   image: openjdk:12-alpine
   before_script:
-    - apk --no-cache add curl 
+    - apk --no-cache add curl
   script:
-    - java -jar ./build/libs/$ARTIFACT_NAME & 
+    - java -jar ./build/libs/$ARTIFACT_NAME &
     - sleep 30
-    - curl https://localhost:5000/actuator/health | grep "UP"
+    - curl http://localhost:5000/actuator/health | grep "UP"
+
+code quality:
+  stage: test
+  image: openjdk:12-alpine
+  script:
+    - ./gradlew pmdMain pmdTest
+  artifacts:
+    when: always
+    paths:
+      - build/reports/pmd
+
+unit tests:
+  stage: test
+  image: openjdk:12-alpine
+  script:
+    - ./gradlew test
+  artifacts:
+    when: always
+    paths:
+      - build/reports/tests
+    reports:
+      junit: build/test-results/test/*.xml
 
 deploy:
   stage: deploy
@@ -46,3 +70,27 @@ deploy:
     - sleep 45
     - curl http://$CNAME/actuator/info | grep $CI_PIPELINE_IID
     - curl http://$CNAME/actuator/health | grep "UP"
+
+api testing:
+  stage: post deploy
+  image:
+    name: vdespa/newman
+    entrypoint: [""]
+  script:
+    - newman --version
+    - newman run "Cars API.postman_collection.json" --environment Production.postman_environment.json --reporters cli,htmlextra,junit --reporter-htmlextra-export "newman/report.html" --reporter-junit-export "newman/report.xml"
+  artifacts:
+    when: always
+    paths:
+      - newman/
+    reports:
+      junit: newman/report.xml
+
+pages:
+  stage: publishing
+  script:
+    - mkdir public
+    - mv newman/report.html public/index.html
+  artifacts:
+    paths:
+      - public
