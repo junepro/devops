@@ -1,9 +1,5 @@
 provider "aws" {
   region = local.region
-
-  assume_role {
-    role_arn = "arn:aws:iam::562806027032:role/outpost-shared-anton"
-  }
 }
 
 data "aws_availability_zones" "available" {}
@@ -22,7 +18,27 @@ locals {
   }
 
   network_acls = {
-    outpost_inbound = [
+    default_inbound = [
+      {
+        rule_number = 900
+        rule_action = "allow"
+        from_port   = 1024
+        to_port     = 65535
+        protocol    = "tcp"
+        cidr_block  = "0.0.0.0/0"
+      },
+    ]
+    default_outbound = [
+      {
+        rule_number = 900
+        rule_action = "allow"
+        from_port   = 32768
+        to_port     = 65535
+        protocol    = "tcp"
+        cidr_block  = "0.0.0.0/0"
+      },
+    ]
+    public_inbound = [
       {
         rule_number = 100
         rule_action = "allow"
@@ -64,7 +80,7 @@ locals {
         ipv6_cidr_block = "::/0"
       },
     ]
-    outpost_outbound = [
+    public_outbound = [
       {
         rule_number = 100
         rule_action = "allow"
@@ -114,6 +130,40 @@ locals {
         ipv6_cidr_block = "::/0"
       },
     ]
+    elasticache_outbound = [
+      {
+        rule_number = 100
+        rule_action = "allow"
+        from_port   = 80
+        to_port     = 80
+        protocol    = "tcp"
+        cidr_block  = "0.0.0.0/0"
+      },
+      {
+        rule_number = 110
+        rule_action = "allow"
+        from_port   = 443
+        to_port     = 443
+        protocol    = "tcp"
+        cidr_block  = "0.0.0.0/0"
+      },
+      {
+        rule_number = 140
+        rule_action = "allow"
+        icmp_code   = -1
+        icmp_type   = 12
+        protocol    = "icmp"
+        cidr_block  = "10.0.0.0/22"
+      },
+      {
+        rule_number     = 150
+        rule_action     = "allow"
+        from_port       = 90
+        to_port         = 90
+        protocol        = "tcp"
+        ipv6_cidr_block = "::/0"
+      },
+    ]
   }
 }
 
@@ -122,41 +172,38 @@ locals {
 ################################################################################
 
 module "vpc" {
-  source = "../../"
+  source = "../.."
 
   name = local.name
   cidr = local.vpc_cidr
 
-  azs             = local.azs
-  private_subnets = [for k, v in local.azs : cidrsubnet(local.vpc_cidr, 8, k)]
-  public_subnets  = [for k, v in local.azs : cidrsubnet(local.vpc_cidr, 8, k + 4)]
+  azs                 = local.azs
+  private_subnets     = [for k, v in local.azs : cidrsubnet(local.vpc_cidr, 8, k)]
+  public_subnets      = [for k, v in local.azs : cidrsubnet(local.vpc_cidr, 8, k + 4)]
+  elasticache_subnets = [for k, v in local.azs : cidrsubnet(local.vpc_cidr, 8, k + 8)]
 
-  # Outpost is using single AZ specified in `outpost_az`
-  outpost_subnets = ["10.0.50.0/24", "10.0.51.0/24"]
-  outpost_arn     = data.aws_outposts_outpost.shared.arn
-  outpost_az      = data.aws_outposts_outpost.shared.availability_zone
+  public_dedicated_network_acl   = true
+  public_inbound_acl_rules       = concat(local.network_acls["default_inbound"], local.network_acls["public_inbound"])
+  public_outbound_acl_rules      = concat(local.network_acls["default_outbound"], local.network_acls["public_outbound"])
+  elasticache_outbound_acl_rules = concat(local.network_acls["default_outbound"], local.network_acls["elasticache_outbound"])
 
-  # IPv6
-  enable_ipv6                                    = true
-  outpost_subnet_assign_ipv6_address_on_creation = true
-  outpost_subnet_ipv6_prefixes                   = [2, 3, 4]
+  private_dedicated_network_acl     = false
+  elasticache_dedicated_network_acl = true
 
-  # NAT Gateway
-  enable_nat_gateway = true
+  manage_default_network_acl = true
+
+  enable_ipv6 = true
+
+  enable_nat_gateway = false
   single_nat_gateway = true
 
-  # Network ACLs
-  outpost_dedicated_network_acl = true
-  outpost_inbound_acl_rules     = local.network_acls["outpost_inbound"]
-  outpost_outbound_acl_rules    = local.network_acls["outpost_outbound"]
+  public_subnet_tags = {
+    Name = "overridden-name-public"
+  }
 
   tags = local.tags
-}
 
-################################################################################
-# Supporting Resources
-################################################################################
-
-data "aws_outposts_outpost" "shared" {
-  name = "SEA19.07"
+  vpc_tags = {
+    Name = "vpc-name"
+  }
 }

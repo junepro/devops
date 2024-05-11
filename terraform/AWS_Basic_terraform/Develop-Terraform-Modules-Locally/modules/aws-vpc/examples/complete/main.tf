@@ -23,7 +23,7 @@ locals {
 ################################################################################
 
 module "vpc" {
-  source = "../../"
+  source = "../.."
 
   name = local.name
   cidr = local.vpc_cidr

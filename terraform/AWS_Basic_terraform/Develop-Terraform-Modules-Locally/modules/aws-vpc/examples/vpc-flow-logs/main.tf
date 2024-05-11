@@ -25,7 +25,7 @@ locals {
 ################################################################################
 
 module "vpc_with_flow_logs_s3_bucket" {
-  source = "../../"
+  source = "../.."
 
   name = local.name
   cidr = local.vpc_cidr
@@ -42,7 +42,7 @@ module "vpc_with_flow_logs_s3_bucket" {
 }
 
 module "vpc_with_flow_logs_s3_bucket_parquet" {
-  source = "../../"
+  source = "../.."
 
   name = "${local.name}-parquet"
   cidr = local.vpc_cidr
@@ -61,7 +61,7 @@ module "vpc_with_flow_logs_s3_bucket_parquet" {
 
 # CloudWatch Log Group and IAM role created automatically
 module "vpc_with_flow_logs_cloudwatch_logs_default" {
-  source = "../../"
+  source = "../.."
 
   name = "${local.name}-cloudwatch-logs-default"
   cidr = local.vpc_cidr
@@ -84,7 +84,7 @@ module "vpc_with_flow_logs_cloudwatch_logs_default" {
 
 # CloudWatch Log Group and IAM role created separately
 module "vpc_with_flow_logs_cloudwatch_logs" {
-  source = "../../"
+  source = "../.."
 
   name = "${local.name}-cloudwatch-logs"
   cidr = local.vpc_cidr
