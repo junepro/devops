@@ -5,7 +5,4 @@ resource "kubernetes_storage_class_v1" "ebs_sc" {
   }
   storage_provisioner = "ebs.csi.aws.com"
   volume_binding_mode = "WaitForFirstConsumer"
-  #ebs 볼륨 증가 및 감소 옵션
-  allow_volume_expansion = "true"
-  reclaim_policy = "Retain"
 }
