@@ -1,0 +1,11 @@
+kubectl create namsespace monitoring
+
+# repo 추가
+helm repo add prometheus-community https://prometheus-community.github.io/
+helm repo update
+
+# config file 수정
+helm pull prometheus-community/kube-prometheus-stack
+tar xvfz kube-prometheus-stack-65.3.1.tgz
+
+
