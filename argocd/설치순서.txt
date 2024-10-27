@@ -23,4 +23,7 @@ kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "NodePort"}}'
 # minikube svc 주소 확인
 minikube service argocd-server -n argocd --url
 
+# 강의 깃주소
+https://github.com/mabusaa/argocd-course-apps-definitions/tree/main/applications%20and%20projects
 
+https://github.com/mabusaa/argocd-example-apps/tree/master
