@@ -3,3 +3,4 @@
 /terraform/AWS_Basic_terraform/aws-elb-classicLB/.terraform/
 /terraform/EKS_terraform/EC2-BastionHost/private-key
 /monitoring/kube-prometheus-stack
+/terraform/EKS_terraform/myEks
