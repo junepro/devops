@@ -1,0 +1,7 @@
+k exec -it net -- $(kubectl get po -l version=v1 -o wide | awk 'NR==' | awk '{print $6')
+                     POD IP
+
+k exec -it net -- curl hello-svc.default.svc.cluster.local
+
+
+k exec -it net -- curl http://127.0.0.1:10196

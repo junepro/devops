@@ -4,3 +4,4 @@
 /terraform/EKS_terraform/EC2-BastionHost/private-key
 /monitoring/kube-prometheus-stack
 /terraform/EKS_terraform/myEks
+/istio/restudy/istio/helm/sample/test-2/robot-shop/
