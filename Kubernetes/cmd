@@ -8,7 +8,7 @@ kubectl expose pod redis --port=6379 --name redis-service --dry-run=client -o ya
 
 kubectl run pod redis --port 6379 --expose true
 
-kubectl expose pod nginx --port=80 --name nginx-service --type=NodePort --dry-run=client -o yaml
+kubectl expose pod nginx --port=80 target-port=30080 --name nginx-service --type=NodePort --dry-run=client -o yaml
 
 kubectl replace --force -f <file-to-path>
 
@@ -50,3 +50,19 @@ kubectl get pod ex -o yaml > pod.yaml
 ** deploy image
 
     kubectl set image deploy frontend app2=cloud/app2:v2
+
+** kubectl config use-context context-name
+
+
+** kubectl get pod --as dev-user  ## role
+
+** kubectl create role dev --verb=list,create,delete resources=pods
+
+** kubectl create rolebinding dev-user-binding --role=dev --user=dev-user
+
+** namespace  not found  즉 생성 되지 않은 경우에
+   생성 명령 시 자동 provision 되게 하는 방법
+
+ kube-apiserver /etc/kubernetes/manifests/kube-apiserver.yaml
+
+ 에서 command > --enable-admission-plugins=NodeNamespaceAutoProvision 설정 추가
