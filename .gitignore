@@ -5,3 +5,4 @@
 /monitoring/kube-prometheus-stack
 /terraform/EKS_terraform/myEks
 /istio/restudy/istio/helm/sample/test-2/robot-shop/
+/project/aws_terraform/ec2-3tier-basic/private-key
