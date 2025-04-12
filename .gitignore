@@ -9,3 +9,5 @@
 /project/aws_terraform/ec2-3tier-lb/private-key
 /project/aws_terraform/ec2-3tier-lb-contextPath/private-key
 /terraform/EKS_terraform/VPC/3tier-Bastion/bastion/private-key
+/project/aws_terraform/eks-demo/bastion/private-key
+/project/aws_terraform/eks-demo/bastion/.terraform
