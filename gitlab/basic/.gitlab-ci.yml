@@ -12,9 +12,9 @@ build_car:
     - touch car.txt
     - echo "chassis" > car.txt
     - cat car.txt
-artifacts:
-  paths:
-    - build/
+  artifacts:
+    paths:
+      - build/
 
 test_car:
   image: alpine

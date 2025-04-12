@@ -12,3 +12,6 @@
 /project/aws_terraform/eks-demo/bastion/private-key
 /project/aws_terraform/eks-demo/bastion/.terraform
 /project/aws_terraform/s3-staticweb
+/gitlab/docker/data
+/gitlab/docker/config
+/gitlab/docker/logs
