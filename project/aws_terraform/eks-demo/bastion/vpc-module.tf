@@ -1,3 +1,5 @@
+data "aws_availability_zones" "available" {
+}
 # Create VPC Terraform Module
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
@@ -22,8 +24,8 @@ module "vpc" {
   single_nat_gateway = var.vpc_single_nat_gateway
 
   # VPC DNS Parameters
-  enable_dns_hostnames = false
-  enable_dns_support   = false
+  enable_dns_hostnames = true
+  enable_dns_support   = true
 
 
   tags = local.common_tags

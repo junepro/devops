@@ -12,6 +12,9 @@
 /project/aws_terraform/eks-demo/bastion/private-key
 /project/aws_terraform/eks-demo/bastion/.terraform
 /project/aws_terraform/s3-staticweb
+/project/aws_terraform/eks-demo/bastion/terraform.tfstate
+/project/aws_terraform/eks-demo/bastion/terraform.tfstate.backup
+/project/aws_terraform/eks-demo/bastion/.terraform.lock.hcl
 /gitlab/docker/data
 /gitlab/docker/config
 /gitlab/docker/logs
