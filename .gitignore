@@ -11,3 +11,4 @@
 /terraform/EKS_terraform/VPC/3tier-Bastion/bastion/private-key
 /project/aws_terraform/eks-demo/bastion/private-key
 /project/aws_terraform/eks-demo/bastion/.terraform
+/project/aws_terraform/s3-staticweb
