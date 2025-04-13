@@ -1,0 +1,8 @@
+#aws kube 내 환경에 클러스터 연동
+aws eks --region ap-northeast-2 update-kubeconfig --name hr-stag-eksdemo1
+
+Updated context arn:aws:eks:ap-northeast-2:093490087589:cluster/hr-stag-eksdemo1 in C:\Users\June\.kube\config
+
+
+## 없으면 설치 kubectl
+curl -O https://s3.us-west-2.amazonaws.com/amazon-eks/1.31.4/2025-01-10/bin/darwin/amd64/kubectl

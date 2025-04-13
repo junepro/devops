@@ -19,7 +19,7 @@ resource "aws_eks_node_group" "eks_ng_public" {
   }
 
   scaling_config {
-    desired_size = 1
+    desired_size = 0
     min_size     = 1
     max_size     = 2
   }
