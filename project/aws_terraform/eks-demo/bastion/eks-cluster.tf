@@ -14,6 +14,7 @@ resource "aws_eks_cluster" "eks_cluster" {
     service_ipv4_cidr = var.cluster_service_ipv4_cidr
   }
 
+
 #  # Enable EKS Cluster Control Plane Logging
 #  enabled_cluster_log_types = ["api", "audit", "authenticator", "controllerManager", "scheduler"]
 
