@@ -15,3 +15,319 @@ AmazonEKSClusterPolicy
 AmazonEKSVPCResourceController
 
 AmazonEKSWorkerNodePolicy
+
+
+
+## aws cmd
+
+aws sts get-caller-identity
+
+# Create IAM User
+aws iam create-user --user-name eksadmin1
+
+# Attach AdministratorAccess Policy to User
+aws iam attach-user-policy --policy-arn arn:aws:iam::aws:policy/AdministratorAccess --user-name eksadmin1
+
+# Set password for eksadmin1 user
+aws iam create-login-profile --user-name eksadmin1 --password @EKSUser101 --no-password-reset-required
+
+# Create Security Credentials for IAM User and make a note of them
+aws iam create-access-key --user-name eksadmin1
+
+# Clean-Up kubeconfig
+cat $HOME/.kube/config
+>$HOME/.kube/config
+cat $HOME/.kube/config
+
+# Configure kubeconfig for eksadmin1 AWS CLI profile
+aws eks --region us-east-1 update-kubeconfig --name hr-dev-eksdemo1 --profile eksadmin1
+
+
+kubectl -n kube-system get configmap aws-auth -o yaml
+
+
+Review aws-auth ConfigMap
+apiVersion: v1
+data:
+  mapRoles: |
+    - groups:
+      - system:bootstrappers
+      - system:nodes
+      rolearn: arn:aws:iam::180789647333:role/hr-dev-eks-nodegroup-role
+      username: system:node:{{EC2PrivateDNSName}}
+  mapUsers: |
+    - userarn: arn:aws:iam::180789647333:user/eksadmin1
+      username: eksadmin1
+      groups:
+        - system:masters
+kind: ConfigMap
+metadata:
+  creationTimestamp: "2022-03-11T00:18:40Z"
+  name: aws-auth
+  namespace: kube-system
+  resourceVersion: "9571"
+  uid: 00614a82-89d1-4b11-a7e7-e02cb1ad2d02
+
+
+## 일반 유저
+
+apiVersion: v1
+data:
+  mapRoles: |
+    - groups:
+      - system:bootstrappers
+      - system:nodes
+      rolearn: arn:aws:iam::180789647333:role/hr-dev-eks-nodegroup-role
+      username: system:node:{{EC2PrivateDNSName}}
+  mapUsers: |
+    - userarn: arn:aws:iam::180789647333:user/eksadmin1
+      username: eksadmin1
+      groups:
+        - system:masters
+    - userarn: arn:aws:iam::180789647333:user/eksadmin2
+      username: eksadmin2        << 일반유저
+      groups:
+        - system:masters
+kind: ConfigMap
+metadata:
+  creationTimestamp: "2022-03-12T01:19:22Z"
+  name: aws-auth
+  namespace: kube-system
+  resourceVersion: "16741"
+  uid: e082bd27-b580-4e52-933b-63c56f06c99b
+
+
+  # To list all configuration data
+  aws configure list
+
+  # To list all your profile names
+  aws configure list-profiles
+
+  # Configure aws cli eksadmin1 Profile
+  aws configure --profile eksadmin2
+  AWS Access Key ID: AK
+  AWS Secret Access Key: ISxhW0Uqs
+  Default region: us-east-1
+  Default output format: json
+
+  # To list all your profile names
+  aws configure list-profiles
+
+  # Create IAM Policy
+  cd 20-EKS-Admins-AWS-Basic-User/iam-files
+  aws iam create-policy --policy-name eks-full-access-policy --policy-document file://eks-full-access-policy.json
+
+  # Attach Policy to eksadmin2 user (Update ACCOUNT-ID and Username)
+  aws iam attach-user-policy --policy-arn arn:aws:iam::180789647333:policy/eks-full-access-policy --user-name eksadmin2
+
+  {
+      "Version": "2012-10-17",
+      "Statement": [
+          {
+              "Effect": "Allow",
+              "Action": [
+                  "iam:ListRoles",
+                  "eks:*",
+                  "ssm:GetParameter"
+              ],
+              "Resource": "*"
+          }
+      ]
+  }
+
+
+## Create IAM Role, IAM Trust Policy and IAM Policy
+   # Verify User (Ensure you are using AWS Admin)
+   aws sts get-caller-identity
+
+   # Export AWS Account ID
+   ACCOUNT_ID=$(aws sts get-caller-identity --query "Account" --output text)
+   echo $ACCOUNT_ID
+
+   # IAM Trust Policy
+   POLICY=$(echo -n '{"Version":"2012-10-17","Statement":[{"Effect":"Allow","Principal":{"AWS":"arn:aws:iam::'; echo -n "$ACCOUNT_ID"; echo -n ':root"},"Action":"sts:AssumeRole","Condition":{}}]}')
+
+   # Verify both values
+   echo ACCOUNT_ID=$ACCOUNT_ID
+   echo POLICY=$POLICY
+
+   # Create IAM Role
+   aws iam create-role \
+     --role-name eks-admin-role \
+     --description "Kubernetes administrator role (for AWS IAM Authenticator for Kubernetes)." \
+     --assume-role-policy-document "$POLICY" \
+     --output text \
+     --query 'Role.Arn'
+
+   # Create IAM Policy - EKS Full access
+   cd iam-files
+   aws iam put-role-policy --role-name eks-admin-role --policy-name eks-full-access-policy --policy-document file://eks-full-access-policy.json
+
+ # Create IAM User Groups
+ aws iam create-group --group-name eksadmins
+
+ # Verify AWS ACCOUNT_ID is set
+ echo $ACCOUNT_ID
+
+ # IAM Group Policy
+ ADMIN_GROUP_POLICY=$(echo -n '{
+   "Version": "2012-10-17",
+   "Statement": [
+     {
+       "Sid": "AllowAssumeOrganizationAccountRole",
+       "Effect": "Allow",
+       "Action": "sts:AssumeRole",
+       "Resource": "arn:aws:iam::'; echo -n "$ACCOUNT_ID"; echo -n ':role/eks-admin-role"
+     }
+   ]
+ }')
+
+ # Verify Policy (if AWS Account Id replaced in policy)
+ echo $ADMIN_GROUP_POLICY
+
+ # Create Policy
+ aws iam put-group-policy \
+ --group-name eksadmins \
+ --policy-name eksadmins-group-policy \
+ --policy-document "$ADMIN_GROUP_POLICY"
+
+ ###### Gives Access to our IAM Roles in EKS Cluster ######
+
+ # Verify aws-auth configmap before making changes
+ kubectl -n kube-system get configmap aws-auth -o yaml
+
+ # Edit aws-auth configmap
+ kubectl -n kube-system edit configmap aws-auth
+
+ # ADD THIS in data -> mapRoles section of your aws-auth configmap
+ # Replace ACCOUNT_ID and EKS-ADMIN-ROLE
+     - rolearn: arn:aws:iam::<ACCOUNT_ID>:role/<EKS-ADMIN-ROLE>
+       username: eks-admin
+       groups:
+         - system:masters
+
+ # When replaced with Account ID and IAM Role Name
+   mapRoles: |
+     - rolearn: arn:aws:iam::180789647333:role/hr-dev-eks-nodegroup-role
+       username: system:node:{{EC2PrivateDNSName}}
+       groups:
+         - system:bootstrappers
+         - system:nodes
+     - rolearn: arn:aws:iam::180789647333:role/eks-admin-role
+       username: eks-admin
+       groups:
+         - system:masters
+
+ # Verify aws-auth configmap after making changes
+ kubectl -n kube-system get configmap aws-auth -o yaml
+
+
+ Sample Output
+ apiVersion: v1
+ data:
+   mapRoles: |
+     - groups:
+       - system:bootstrappers
+       - system:nodes
+       rolearn: arn:aws:iam::180789647333:role/hr-dev-eks-nodegroup-role
+       username: system:node:{{EC2PrivateDNSName}}
+     - rolearn: arn:aws:iam::180789647333:role/eks-admin-role
+       username: eks-admin
+       groups:
+         - system:masters
+ kind: ConfigMap
+ metadata:
+   creationTimestamp: "2022-03-12T05:33:28Z"
+   name: aws-auth
+   namespace: kube-system
+   resourceVersion: "1336"
+   uid: f8174f23-554a-43e0-b47a-5eba338605ea
+
+
+ ###### Create IAM User and Associate to IAM Group ######
+# Create IAM User
+aws iam create-user --user-name eksadmin1
+
+# Associate IAM User to IAM Group  eksadmins
+aws iam add-user-to-group --group-name <GROUP> --user-name <USER>
+aws iam add-user-to-group --group-name eksadmins --user-name eksadmin1
+
+# Set password for eksadmin1 user
+aws iam create-login-profile --user-name eksadmin1 --password @EKSUser101 --no-password-reset-required
+
+# Create Security Credentials for IAM User and make a note of them
+aws iam create-access-key --user-name eksadmin1
+
+# Sample Output
+{
+    "AccessKey": {
+        "UserName": "eksadmin1",
+        "AccessKeyId": "AKIASUF7HC7SRJ3MIWDF",
+        "Status": "Active",
+        "SecretAccessKey": "nUQYMdk5FdImSD4/uWPFh1wJMaQf2hHFnTr0BlXi",
+        "CreateDate": "2022-03-12T05:37:39+00:00"
+    }
+}
+
+
+Assume IAM Role and Configure kubectl
+# Export AWS Account ID
+ACCOUNT_ID=$(aws sts get-caller-identity --query "Account" --output text)
+echo $ACCOUNT_ID
+
+ ##### Assume IAM Role STS  #####
+aws sts assume-role --role-arn "arn:aws:iam::<REPLACE-YOUR-ACCOUNT-ID>:role/eks-admin-role" --role-session-name eksadminsession01
+aws sts assume-role --role-arn "arn:aws:iam::$ACCOUNT_ID:role/eks-admin-role" --role-session-name eksadminsession101
+
+# GET Values and replace here
+export AWS_ACCESS_KEY_ID=RoleAccessKeyID
+export AWS_SECRET_ACCESS_KEY=RoleSecretAccessKey
+export AWS_SESSION_TOKEN=RoleSessionToken
+
+## SAMPLE FOR REFERENCE
+export AWS_ACCESS_KEY_ID=ASIASUF7HC7SQXB5EHPV
+export AWS_SECRET_ACCESS_KEY=oSIwk+vJW9XoXbPTHt5+6/mNQqMJzLul1QRJ1d2C
+export AWS_SESSION_TOKEN=IQoJb3JpZ2luX2VjEK7//////////wEaCXVzLWVhc3QtMSJIMEYCIQDPkGKDxwIdGt+D2vBHGYtiu4gJzQor6+saBwbKO6ZQkAIhANRm3TnVVnBwewDnZTAklwt/ghy4SvA204YaTpEnv1yVKp8CCCcQAxoMMTgwNzg5NjQ3MzMzIgw9un24WGzvuG2wQ6cq/AFspVDHeXeAHbUHyAc2eh9WcjSG0NQ9cE/6Mjk/9PseI96xhOxp8q/fGoqELyrxy5kBSI0qEaPPIgWOGZ/v410P/GrneVrJ3kY7w18wUV5te1FzfE0VuALwILiXwnyAzv21w7PmqAufpGBGf/nU5oqQlsRGwNqX9nLvkmWutY9zMg2dxOtA9kRUqbDpi3zzSXypH5gkF1ZhCqxxMdjvOu4XkzjrU2vprwt2Q4joXHCOYhqEUJ0CpfKga58QnLJL0EfYWBj4UIU3/LVCxN6HBfqH84lYwEOvK43FMvNQ2bhSeueGCq624Zj/insUkP0uhqbDrxeJ7lU0cmX2JrcwtOewkQY6nAHEpez7tN6MXY5/QQWokVe1hgqB5AzpoBGRoOa2hjvH5hcvmFfJ/S360hPa60JXR+mewZG6p8O7LVwtOHTb9/h6+10iud8zdKM45+rYJAjb+geiGanY1WIvfh8DOFmpdEQQCq7QrUlLvJJ0grtoSv9u1sczPUlyWCJDkj20y8Pb4kupDSPKm96DU/3Do5vMktr5T7l/bJQWMMh7z2M=
+
+
+# Verify current user configured in aws cli
+aws sts get-caller-identity
+
+## Sample Output
+Kalyans-Mac-mini:01-ekscluster-terraform-manifests kalyanreddy$ aws sts get-caller-identity
+{
+    "UserId": "AROASUF7HC7S7PCTLZCTE:eksadminsession101",
+    "Account": "180789647333",
+    "Arn": "arn:aws:sts::180789647333:assumed-role/eks-admin-role/eksadminsession101"
+}
+Kalyans-Mac-mini:01-ekscluster-terraform-manifests kalyanreddy$
+
+# Clean-Up kubeconfig
+>$HOME/.kube/config
+cat $HOME/.kube/config
+
+# Configure kubeconfig for kubectl
+aws eks --region <region-code> update-kubeconfig --name <cluster_name>
+aws eks --region us-east-1 update-kubeconfig --name hr-dev-eksdemo1
+
+# Describe Cluster
+aws eks --region us-east-1 describe-cluster --name hr-dev-eksdemo1 --query cluster.status
+
+# List Kubernetes Nodes
+kubectl get nodes
+kubectl get pods -n kube-system
+
+# To return to the IAM user, remove the environment variables:
+unset AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY AWS_SESSION_TOKEN
+
+# Verify current user configured in aws cli
+aws sts get-caller-identity
+Observation: It should switch back to current AWS_DEFAULT_PROFILE eksadmin1
+
+## Sample Output
+Kalyans-Mac-mini:01-ekscluster-terraform-manifests kalyanreddy$ aws sts get-caller-identity
+{
+    "UserId": "AIDASUF7HC7SQWWZGSGY7",
+    "Account": "180789647333",
+    "Arn": "arn:aws:iam::180789647333:user/eksadmin1"
+}
