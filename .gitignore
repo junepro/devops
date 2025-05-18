@@ -9,12 +9,12 @@
 /project/aws_terraform/ec2-3tier-lb/private-key
 /project/aws_terraform/ec2-3tier-lb-contextPath/private-key
 /terraform/EKS_terraform/VPC/3tier-Bastion/bastion/private-key
-/project/aws_terraform/eks-demo/bastion/private-key
-/project/aws_terraform/eks-demo/bastion/.terraform
+/project/aws_terraform/eks-demo/eks-3tier-lb/private-key
+/project/aws_terraform/eks-demo/eks-3tier-lb/.terraform
 /project/aws_terraform/s3-staticweb
-/project/aws_terraform/eks-demo/bastion/terraform.tfstate
-/project/aws_terraform/eks-demo/bastion/terraform.tfstate.backup
-/project/aws_terraform/eks-demo/bastion/.terraform.lock.hcl
+/project/aws_terraform/eks-demo/eks-3tier-lb/terraform.tfstate
+/project/aws_terraform/eks-demo/eks-3tier-lb/terraform.tfstate.backup
+/project/aws_terraform/eks-demo/eks-3tier-lb/.terraform.lock.hcl
 /gitlab/docker/data
 /gitlab/docker/config
 /gitlab/docker/logs
