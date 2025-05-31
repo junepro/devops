@@ -58,8 +58,8 @@ module "eks" {
       min_size     = var.min_size
 
       instance_types = [var.instance_type]
-      # capacity_type  = "ON_DEMAND" # 또는 "SPOT"
-
+      capacity_type  = "ON_DEMAND" # 또는 "SPOT"
+      disk_size      = 8
       # 노드 그룹에 추가적인 레이블이나 태그를 지정할 수 있습니다.
       labels = {
         "node-group-type" = "default"
@@ -77,13 +77,10 @@ module "eks" {
   }
 }
 
-#resource "aws_dynamodb_table" "terraform_state_lock"{
-#  name = "terraform-lock"
-#  hash_key = "LockID"
-#  billing_mode = "PAY_PER_REQUEST"
-#
-#  attribute {
-#    name = "LockID"
-#    type = "S"
-#  }
-#}
+# AWS Caller Identity (현재 AWS 계정 ID를 가져오기 위해)
+data "aws_caller_identity" "current" {}
+
+# AWS Availability Zones (사용 가능한 AZ 목록을 가져오기 위해)
+data "aws_availability_zones" "available" {
+  state = "available"
+}

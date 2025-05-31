@@ -7,6 +7,14 @@ terraform {
       source  = "hashicorp/aws"
       version = "~> 5.0" # AWS Provider 버전을 명시합니다. 최신 안정 버전을 사용하는 것을 권장합니다.
     }
+    kubernetes = {
+      source  = "hashicorp/kubernetes"
+      version = "~> 2.0"
+    }
+    helm = {
+      source  = "hashicorp/helm"
+      version = "~> 2.0"
+    }
   }
   backend "s3" {
     bucket         = "eks-module-demo" # 실제 S3 버킷 이름으로 변경
