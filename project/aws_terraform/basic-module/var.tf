@@ -57,6 +57,12 @@ variable "private_subnets" {
   default = ["10.0.1.0/24", "10.0.2.0/24"]
 }
 
+variable "env" {
+  description = ""
+  type = string
+  default = "dev"
+}
+
 #variable "vpc_id" {
 #  description = "VPC ID where the EKS cluster will be deployed"
 #  type        = string

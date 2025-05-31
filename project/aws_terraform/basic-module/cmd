@@ -8,3 +8,21 @@ aws dynamodb create-table \
 
 
 aws eks update-kubeconfig --name my-app-eks-cluster --region ap-northeast-2
+
+
+처음 구성 할 때
+
+kubectl get pod 가 안됨
+
+그 이유는 cluster 엔드포인트에서 private에서 외부 통신 다막아서 안됨
+
+그래서
+
+#############
+  cluster_endpoint_public_access  = true
+  #endpoint_private_access = true
+  cluster_endpoint_public_access_cidrs  = ["1.233.102.123/32"]
+
+################
+
+  적용 해야됨

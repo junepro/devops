@@ -38,18 +38,35 @@ module "eks" {
 #    kube-proxy             = {}
 #    vpc-cni                = {}
 #  }
+  # ------------------------------------------------------------------------------------------------
+  # EKS 클러스터 API 엔드포인트 액세스 설정 (모듈 v19.x 이상에서 직접 인자로 사용)
+  # ------------------------------------------------------------------------------------------------
+  cluster_endpoint_public_access  = true  # Private에서 Public으로 변경
+  #endpoint_private_access = true  # (권장) Private Access도 유지 (Public and Private 모드)
+  # 완전히 Public만 원하면 false로 설정
 
-  # EKS 클러스터 액세스 제어
-  # kubectl을 사용하여 클러스터에 접근할 수 있도록 IAM 사용자를 추가합니다.
-  # 여기서 users는 당신의 IAM 사용자 ARN을 명시해야 합니다.
-#  manage_aws_auth_configmap = true
-#  aws_auth_users = [
-#    {
-#      userarn  = "arn:aws:iam::ACCOUNT_ID:user/YOUR_IAM_USERNAME" # YOUR_IAM_USERNAME을 실제 IAM 사용자 이름으로, ACCOUNT_ID를 실제 AWS 계정 ID로 변경
-#      username = "YOUR_IAM_USERNAME"
-#      groups   = ["system:masters"]
-#    }
+  # public_access_cidrs를 반드시 지정해야 합니다!
+  # 이곳에 kubectl을 실행할 PC의 퍼블릭 IP 주소 또는 허용할 IP 범위(CIDR)를 입력합니다.
+  # 예: ["1.2.3.4/32"], 또는 회사 VPN 대역 등
+  cluster_endpoint_public_access_cidrs     = ["1.233.102.123/32"]
 
+  # 기존 manage_aws_auth_configmap, aws_auth_users 대신 access_entries 사용
+  access_entries = {
+    june = {
+      principal_arn        = "arn:aws:iam::093490087589:user/june"
+      access_policies_arns = ["eks::aws:cluster-access-policy/AmazonEKSAdminPolicy"]
+    }
+    eks_admin_user = {
+      # userarn은 IAM User ARN이어야 합니다.
+      principal_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:user/${aws_iam_user.admin_user.name}"
+      access_policies_arns = ["arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"] # 필요에 따라 추가 정책 ARN 지정
+    }
+    # IAM Role에 대한 접근 권한을 부여하는 경우
+     eks_admin_role = {
+       principal_arn = aws_iam_role.eks_admin_role.arn # IAM Role ARN
+       access_policies_arns = ["arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"] # 필요에 따라 추가 정책 ARN 지정
+     }
+  }
 
   eks_managed_node_groups = {
     eks-module = {
