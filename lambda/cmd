@@ -1,0 +1,26 @@
+시작 하기 전
+
+npm install -g serverless@3.39.0 # 또는 안정적인 v3 버전으로 설치
+serverless --version
+
+serverless config
+
+serverless config credentials --provider aws --key access_key --secret secret_key profile serverless serverless-admin
+
+
+serverless create --template google-python --path hello-world-gpython
+
+설정 변경 후 배포
+serverless deploy
+
+빠른 배포
+serverless deploy function -f hello  (함수 이름 )
+
+함수실행
+serverless invoke --function hello --log
+
+serverless logs -f hello 
+
+설정 정리
+serverless remove
+
