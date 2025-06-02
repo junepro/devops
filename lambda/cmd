@@ -24,3 +24,25 @@ serverless logs -f hello
 설정 정리
 serverless remove
 
+
+
+serverless create --template aws-python3 --path python-example
+
+
+sam 설치 후
+
+
+sam init
+
+sam build
+
+[*] Validate SAM template: sam validate
+[*] Invoke Function: sam local invoke  or sam local start-api -p 8083
+[*] Test Function in the Cloud: sam sync --stack-name {{stack-name}} --watch
+[*] Deploy: sam deploy --guided
+
+
+sam local invoke "HelloWorldFunction" -e events/event.json
+
+aws cloudformation delete-stack --stack-name sam-app --region ap-northeast-2
+
