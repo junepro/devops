@@ -1,0 +1,39 @@
+service: python-s3-upload
+
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: python3.9
+  stage: dev
+  region: ap-northeast-2
+  timeout: 10
+  memorySize: 128
+  environment:
+    THUMBNAIL_SIZE: "128"
+    DYNAMODB_TABLE: ${self:custom.dynamotable}
+    REGION_NAME: ${self:provider.region}
+
+  iam:
+    role:
+      statements:
+        - Effect: 'Allow'
+          Resource: '*'
+          Action: 's3:*'
+        - Effect: Allow
+          Action:
+            - dynamodb:Query
+            - dynamodb:Scan
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+          Resource: "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE}"
+
+functions:
+  hello-env-gina:
+    handler: handler.hello
+  hello-env-marc:
+    handler: handler.hello
+    environment:
+      FIRST_NAME: "Marc"

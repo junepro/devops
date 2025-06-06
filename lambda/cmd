@@ -46,3 +46,9 @@ sam local invoke "HelloWorldFunction" -e events/event.json
 
 aws cloudformation delete-stack --stack-name sam-app --region ap-northeast-2
 
+
+vs code 상단에서 
+
+> create > stepFunction 
+
+> publish > stepFunction > ap-northeast-2 > quck create > VSStateMachine
