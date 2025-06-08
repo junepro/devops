@@ -11,7 +11,7 @@ serverless config credentials --provider aws --key access_key --secret secret_ke
 serverless create --template google-python --path hello-world-gpython
 
 설정 변경 후 배포
-serverless deploy
+serverless deploy --verbose
 
 빠른 배포
 serverless deploy function -f hello  (함수 이름 )
@@ -52,3 +52,8 @@ vs code 상단에서
 > create > stepFunction 
 
 > publish > stepFunction > ap-northeast-2 > quck create > VSStateMachine
+
+
+serverless.yml 
+function 에서
+  http: 설정 들어가면 apiGateway로 인식 
