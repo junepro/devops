@@ -5,7 +5,7 @@ serverless --version
 
 serverless config
 
-serverless config credentials --provider aws --key access_key --secret secret_key profile serverless serverless-admin
+serverless config credentials --provider aws --key access_key --secret secret_key --profile serverless serverless-admin
 
 
 serverless create --template google-python --path hello-world-gpython

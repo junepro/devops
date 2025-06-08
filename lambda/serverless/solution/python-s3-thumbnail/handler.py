@@ -17,6 +17,7 @@ size = int(os.environ['THUMBNAIL_SIZE'])
 dbtable = str(os.environ['DYNAMODB_TABLE'])
 
 
+
 def s3_thumbnail_generator(event, context):
     # parse event
     print("EVENT:::", event)
