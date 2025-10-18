@@ -1,0 +1,13 @@
+
+# 키생성
+ssh-keygen -f mykey
+
+
+# 테라폼 원격 업무시 꼬일 경우
+terraform force-unlock -h
+
+terraform force-unlock #apply_id
+
+
+
+
