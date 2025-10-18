@@ -32,33 +32,23 @@ resource "aws_instance" "web" {
   }
 }
 
-resource "aws_security_group" "allow_ssh" {
-  name        = "allow_ssh"
-  description = "Allow SSH inbound traffic and all outbound traffic"
-  vpc_id      = module.vpc.vpc_id
-
-  ingress {
-    from_port        = 22
-    to_port          = 22
-    protocol         = "tcp"
-    cidr_blocks      = ["0.0.0.0/0"]
-    ipv6_cidr_blocks = ["::/0"]
-  }
-
-  egress {
-    from_port        = 0
-    to_port          = 0
-    protocol         = "-1"
-    cidr_blocks      = ["0.0.0.0/0"]
-    ipv6_cidr_blocks = ["::/0"]
-  }
-
-  tags = {
-    Name = "allow_ssh"
-  }
-}
-
 resource "aws_key_pair" "mykey" {
   key_name   = "mykey-demo"
   public_key = file("${path.module}/mykey.pub")
+}
+
+resource "aws_ebs_volume" "ebs-volume-1" {
+  availability_zone = "eu-west-1a"
+  size              = 20
+  type              = "gp2"
+  tags = {
+    Name = "extra volume data"
+  }
+}
+
+resource "aws_volume_attachment" "ebs-volume-1-attachment" {
+  device_name  = "/dev/xvdh"
+  volume_id    = aws_ebs_volume.ebs-volume-1.id
+  instance_id  = aws_instance.web.id
+  skip_destroy = true                            # skip destroy to avoid issues with terraform destroy
 }
