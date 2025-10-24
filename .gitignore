@@ -18,3 +18,4 @@
 /gitlab/docker/data
 /gitlab/docker/config
 /gitlab/docker/logs
+/gitlab/docker

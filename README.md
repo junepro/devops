@@ -26,7 +26,7 @@ Grafana, Prometheus, Datadog을 이용한 모니터링 고도화 및 비용 효�
 - ArgoCD 기반 배포 자동화
 - Grafana + Loki + Prometheus + Datadog 통합 모니터링 구축  
 
-### 📊 Data Pipeline (CDC Project)
+### 📊 Data Lake (CDC Project)
 - 데이터 엔지니어와 협업하여 datalake 환경 구축 작업
 - 로그 수집, 적재, 모니터링 자동화 구현
 <img width="1920" height="1040" alt="cdc설계도" src="https://github.com/user-attachments/assets/9fb3998a-4d29-4313-8011-9b3d1b1ccfba" />
