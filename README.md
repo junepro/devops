@@ -4,6 +4,9 @@ AWS 및 온프레미스 환경에서 클라우드 관리업무 담당한 DevOps 
 Terraform, GitLab, ArgoCD를 통한 IaC 및 GitOps 기반 배포 자동화를 구현하고,  
 Grafana, Prometheus, Datadog을 이용한 모니터링 고도화 및 비용 효율화 구조를 운영 중입니다.
 
+## Git 
+현재 git의 주요 내용은 스킬 및 개인 성장을 위해 공부한 내역입니다.
+
 ---
 
 ##  Skills & Tools
