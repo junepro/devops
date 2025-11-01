@@ -36,4 +36,4 @@ Grafana, Prometheus, Datadog을 이용한 모니터링 고도화 및 비용 효�
 
 ### 📊 온프레미스 CI / CD  k8s 구축 
 - dev 환경을 온프레미스 자체 구축 작업진행
-- ![img_1.png](img_1.png)
+<img width="1192" height="523" alt="image" src="https://github.com/user-attachments/assets/9e7e06f5-3011-448b-828f-000014c01703" />
